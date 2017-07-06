@@ -10,6 +10,7 @@ More information on registration can be found here: https://inacademia.org/regis
 
 InAcademia is a OIDC complient OP. Therfor all certified OIDC RPs shoudl work for InAcademia. A list of certified products and libraties can be found at the OpenIC Connect website: http://openid.net/developers/certified/
 
+Examples:
 * Apache mod OIDC (platform independent) -> https://github.com/InAcademia/Client-docs/blob/master/Apache2%2Bmod_auth_oidc
 * pyOIDC (Python) -> https://github.com/InAcademia/Client-docs/blob/master/pyoidc
 * Nimbus OAuth 2.0 SDK -> https://github.com/InAcademia/Client-docs/blob/master/nimbus
