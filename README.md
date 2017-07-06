@@ -8,6 +8,8 @@ Before you can start, you need to register you service at InAcademia. You will r
 you must provide a RedirectURI where the response for your service will be returned.  Note that you cannot change this endpoint without re-registering.  InAcademia will ask you to prove ownership of the domain used in the RedirectURI.
 More information on registration can be found here: https://inacademia.org/register/
 
+InAcademia is a OIDC complient OP. Therfor all certified OIDC RPs shoudl work for InAcademia. A list of certified products and libraties can be found at the OpenIC Connect website: http://openid.net/developers/certified/
+
 * Apache mod OIDC (platform independent) -> https://github.com/InAcademia/Client-docs/blob/master/Apache2%2Bmod_auth_oidc
 * pyOIDC (Python) -> https://github.com/InAcademia/Client-docs/blob/master/pyoidc
 * Nimbus OAuth 2.0 SDK -> https://github.com/InAcademia/Client-docs/blob/master/nimbus
