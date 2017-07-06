@@ -4,5 +4,9 @@ This section contains client (RP) configuration examples for implementing InAcad
 
 Note: the following code samples are not secure enough to be used in a live production environment, they are only intended to document the basic steps required to complete a transaction with the InAcademia service. Additional measures should be implemented to increase the security.
 
+Before you can start, you need to register you service at InAcademia. You will recieve an “ClientID” and 
+you must provide a RedirectURI where the response for your service will be returned.  Note that you cannot change this endpoint without re-registering.  InAcademia will ask you to prove ownership of the domain used in the RedirectURI.
+More information on registration can be found here: https://inacademia.org/register/
+
 * Apache mod OIDC (platform independent) -> https://github.com/InAcademia/Client-docs/blob/master/Apache2%2Bmod_auth_oidc
 * pyOIDC (Python) -> https://github.com/InAcademia/Client-docs/blob/master/pyoidc
