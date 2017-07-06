@@ -1,22 +1,18 @@
-Apache2 Webserver (using mod_auth_oidc)
+## Apache: [mod_auth_openidc](https://github.com/pingidentity/mod_auth_openidc)
+
+More information can be found [here](https://github.com/pingidentity/mod_auth_openidc/wiki).
 
 The OIDC module for Apache is a very straight forward way of setting up Affiliation validation with InAcademia which can 
 basically be integrated with many applications. This example assumes a script will live inside a specific directly on your 
 server. The directory will be protected by the OIDC module. If InAcademia validation is succesfull the script will pick this up, set the remote user parameter and then continue to a point in the application of your preference.
 
-*Installing mod_auth_oidc*
+### Installing mod_auth_oidc
 Based on https://github.com/pingidentity/mod_auth_openidc
 For most common linux distributions, pull the latest and greatest from the github release page at: 
 https://github.com/pingidentity/mod_auth_openidc/releases
 For debian/ubuntu this Apache module is part of the standard repositories, so install this module alternatively using:
     sudo apt install libapache2-mod-auth-openidc
 Also make sure you have https/ssl configured for you domain.
-
-*Connecting to InAcademia*
-Before you can start, you need to register you service at InAcademia. You will recieve an “ClientID” and 
-you must provide a RedirectURI where the response for your service will be returned. 
-Note that you cannot change this endpoint without re-registering. 
-InAcademia will ask you to prove ownership of the domain used in the RedirectURI.
 
 *Configuring mod_auth_oidc for InAcademia*
 Now configure the mod to work with InAcademia,by providing relevant configuration data to the module. 
@@ -26,53 +22,35 @@ For a secure configuration, you must set a decent value for CryptoPassphrase, wh
 and cookie hash. Use a long random string, for example generated using
     tr -c -d ‘0123456789abcdefghijklmnopqrstuvwxyz’ </dev/urandom | dd bs=32 count=1 2>/dev/null;echo
 
-*InAcademia endpoints*
-This part contains the config of the OP, in this case inacademia.org. Choose either PRODUCTION or TEST
+### Configuration
 
-# FOR PRODUCTION
-    OIDCProviderMetadataURL https://op.srv.inacademia.org/.well-known/openid-configuration
-    OIDCProviderIssuer https://op.srv.inacademia.org
-    OIDCProviderAuthorizationEndpoint https://op.srv.inacademia.org/authorization
+```apache
+Listen <port>
+ServerName <server name>
 
-# FOR TEST
-    OIDCProviderIssuer https://op1.test.inacademia.org/
-    OIDCProviderAuthorizationEndpoint https://op1.test.inacademia.org/authorization
+LoadModule auth_openidc_module /usr/lib/apache2/modules/mod_auth_openidc.so
+LoadModule ssl_module /usr/lib/apache2/modules/mod_ssl.so
 
-*Client configuration*
+<VirtualHost _default_:*>
+    OIDCProviderMetadataURL <inacademia url>/.well-known/openid-configuration
+    OIDCClientID <client id>
+    OIDCRedirectURI https://<hostname>:<port>/protected/authz_cb
+    OIDCResponseType id_token
+    OIDCScope "openid student" # request verification of student affiliation
+    OIDCAuthRequestParams "claims=%7B%22id_token%22%3A%20%7B%22domain%22%3A%20null%7D%7D" # request the additional claim 'domain'
 
-    # InAcademia ONLY supports id_token
-    OIDCResponseType “id_token”
+    OIDCCryptoPassphrase <secret>
 
-    # Choose the relevant scopes and claims as described at https://www.inacademia.org/93-2/
-    # You may not be able to use all scopes an/or claims available
-    OIDCScope “openid persistent student”
+    <Location /protected>
+      AuthType openid-connect
+      Require valid-user
+    </Location>
 
-    # OIDCScope “openid persistent affiliated”
-
-    # OIDCScope “openid persistent student country”
-
-    # OIDCOAuthRemoteUserClaim “country domain”
-
-    # The Redirect URI for your service
-    # This MUST match with the one you provided to InAcademia!
-    OIDCRedirectURI https://your_redirect_url
-
-    # You must provide a good passphrase
-    OIDCCryptoPassphrase REPLACE_ME!!
-
-    # Path for the RP cookie
-
-    OIDCCookiePath /
-
-    # Client ID as provided by InAcademia
-    OIDCClientID “CLIENT ID AS PROVIDED BY INACADEMIA”
-
-    # InAcademia does not need a client secret
-
-    # (as it is using id_token response type),
-    # but some older versions of the OIDC module require one
-    # InAcademia will simply ignores what you put in here
-    OIDCClientSecret “ItsaClientSecretJim,ButNotAsWeKnowIt”
+    SSLEngine on
+    SSLCertificateFile <ssl cert>
+    SSLCertificateKeyFile <ssl key>
+</VirtualHost>
+```
 
 *Secure location*
 To trigger Affiliation validation, create a Location directive in your virtualhost section similar to the example blow.
@@ -84,20 +62,3 @@ To trigger Affiliation validation, create a Location directive in your virtualho
     </Location>
 
 Make sure the directory is part of the Redirect URL!
-
-*Setting remote user*
-
-A simple script (here in php) like the one below should live in the directory you are shielding. It picks up the response from InAcademia, sets the validation result and redirects back to the rest of your site.
-    <?php
-    session_start();
-    echo “InAcademia validation succesful for user:<br>”;
-    echo($_SERVER[‘REMOTE_USER’]);
-    echo “<hr>”;
-    $_SESSION[“InAcademiaRemoteUser”] = $_SERVER[‘REMOTE_USER’];
-
-    /* Redirect browser */
-    header(“Location: https://demoshop.inacademia.org/shop/view_cart.php”);
-
-    /* Make sure that code below does not get executed when we redirect. */
-    exit;
-    ?>
