@@ -34,10 +34,10 @@ LoadModule ssl_module /usr/lib/apache2/modules/mod_ssl.so
 <VirtualHost _default_:*>
     OIDCProviderMetadataURL <inacademia url>/.well-known/openid-configuration
     OIDCClientID <client id>
-    OIDCRedirectURI https://<hostname>:<port>/protected/authz_cb
+    OIDCRedirectURI https://<hostname>:<port>/your_redirect_page
     OIDCResponseType id_token
-    OIDCScope "openid student" # request verification of student affiliation
-    OIDCAuthRequestParams "claims=%7B%22id_token%22%3A%20%7B%22domain%22%3A%20null%7D%7D" # request the additional claim 'domain'
+    OIDCScope "openid student"
+    OIDCAuthRequestParams "claims=%7B%22id_token%22%3A%20%7B%22domain%22%3A%20null%7D%7D"
 
     OIDCCryptoPassphrase <secret>
 
